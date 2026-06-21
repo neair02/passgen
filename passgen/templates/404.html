@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>404 — PassVault</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+<header class="site-header">
+  <div class="container">
+    <div class="logo">
+      <a href="/" style="text-decoration:none;color:inherit;display:flex;align-items:center;gap:.5rem;">
+        <span class="logo-icon">🔐</span><span class="logo-text">PassVault</span>
+      </a>
+    </div>
+  </div>
+</header>
+<main class="container" style="text-align:center;padding-top:5rem;">
+  <div class="empty-state">
+    <span class="empty-icon" style="font-size:4rem;">🔍</span>
+    <h2 style="font-size:2rem;margin:.5rem 0;">404</h2>
+    <p>Такой страницы не существует</p>
+    <a href="/" class="btn btn--primary" style="margin-top:1.5rem;">На главную</a>
+  </div>
+</main>
+</body>
+</html>

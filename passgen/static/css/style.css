@@ -1,0 +1,267 @@
+/* ── Reset & Base ──────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:       #0d1117;
+  --surface:  #161b22;
+  --surface2: #21262d;
+  --border:   #30363d;
+  --accent:   #58a6ff;
+  --accent2:  #3fb950;
+  --danger:   #f85149;
+  --warn:     #d29922;
+  --text:     #e6edf3;
+  --muted:    #8b949e;
+  --mono:     'JetBrains Mono', 'Courier New', monospace;
+  --sans:     'Inter', system-ui, sans-serif;
+  --radius:   10px;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Layout ────────────────────────────────────────────────────── */
+.container { width: min(1100px, 100% - 2rem); margin-inline: auto; }
+
+/* ── Header ────────────────────────────────────────────────────── */
+.site-header {
+  border-bottom: 1px solid var(--border);
+  padding: 1rem 0;
+  background: var(--surface);
+}
+.site-header .container { display: flex; align-items: center; gap: 1.5rem; }
+.logo { display: flex; align-items: center; gap: .5rem; }
+.logo-icon { font-size: 1.4rem; }
+.logo-text  { font-family: var(--mono); font-weight: 700; font-size: 1.2rem; color: var(--accent); }
+.logo-sub   { color: var(--muted); font-size: .85rem; }
+
+/* ── Flash messages ────────────────────────────────────────────── */
+.flashes { margin-top: 1.25rem; display: flex; flex-direction: column; gap: .5rem; }
+.flash {
+  padding: .75rem 1rem;
+  border-radius: var(--radius);
+  font-size: .9rem;
+  border-left: 4px solid;
+}
+.flash--success { background: #1c2a1c; border-color: var(--accent2); color: #79c88e; }
+.flash--error   { background: #2a1c1c; border-color: var(--danger);  color: #f98080; }
+
+/* ── Cards ─────────────────────────────────────────────────────── */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.75rem;
+  margin-top: 1.5rem;
+}
+.section-title {
+  font-family: var(--mono);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 1.25rem;
+  letter-spacing: .02em;
+}
+
+/* ── Generator ─────────────────────────────────────────────────── */
+.gen-output {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.25rem;
+}
+.gen-password {
+  font-family: var(--mono);
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--muted);
+  flex: 1;
+  word-break: break-all;
+  transition: color .2s;
+}
+.gen-password.visible { color: var(--accent2); }
+
+/* Controls */
+.gen-controls { display: flex; flex-direction: column; gap: 1rem; }
+.control-row { display: flex; align-items: center; gap: 1rem; }
+.control-label { color: var(--muted); font-size: .9rem; white-space: nowrap; min-width: 6rem; }
+
+input[type="range"] {
+  flex: 1;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+.toggle-row { display: flex; gap: 1rem; flex-wrap: wrap; }
+.toggle {
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+  cursor: pointer;
+  font-size: .9rem;
+  color: var(--muted);
+  user-select: none;
+}
+.toggle input[type="checkbox"] { accent-color: var(--accent); width: 16px; height: 16px; cursor: pointer; }
+.toggle:has(input:checked) { color: var(--text); }
+
+/* ── Save form ─────────────────────────────────────────────────── */
+.save-form {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border);
+}
+.input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
+.input-group { display: flex; flex-direction: column; gap: .4rem; }
+.input-group label { font-size: .85rem; color: var(--muted); }
+.input-group input {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  font-size: .95rem;
+  padding: .55rem .85rem;
+  font-family: var(--sans);
+  transition: border-color .15s;
+}
+.input-group input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+.input-group input.mono { font-family: var(--mono); }
+.hint { font-size: .8rem; color: var(--muted); margin-top: .25rem; }
+
+.pwd-field-wrap { display: flex; gap: .5rem; align-items: center; }
+.pwd-field-wrap input { flex: 1; }
+
+/* ── Buttons ───────────────────────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  padding: .55rem 1.25rem;
+  border-radius: 6px;
+  font-size: .9rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid transparent;
+  text-decoration: none;
+  transition: opacity .15s, background .15s;
+}
+.btn:hover { opacity: .85; }
+
+.btn--primary { background: var(--accent); color: #000; }
+.btn--save    { background: var(--accent2); color: #000; width: 100%; justify-content: center; }
+.btn--search  { background: var(--surface2); border-color: var(--border); color: var(--text); }
+.btn--ghost   { background: transparent; border-color: var(--border); color: var(--muted); }
+.btn--edit    { background: var(--surface2); border-color: var(--border); color: var(--text); padding: .3rem .6rem; }
+.btn--del     { background: #2a1c1c; border-color: var(--danger); color: var(--danger); padding: .3rem .6rem; }
+.btn--sm      { font-size: .8rem; }
+
+.btn-icon {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  padding: .2rem .4rem;
+  border-radius: 4px;
+  transition: background .15s;
+}
+.btn-icon:hover { background: var(--surface2); }
+
+.btn-row { display: flex; gap: 1rem; margin-top: 1.5rem; }
+
+/* ── Vault ─────────────────────────────────────────────────────── */
+.vault-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+.vault-header .section-title { margin-bottom: 0; }
+.search-form { display: flex; gap: .5rem; align-items: center; }
+.search-input {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  font-size: .9rem;
+  padding: .5rem .85rem;
+  width: 240px;
+  transition: border-color .15s;
+}
+.search-input:focus { outline: none; border-color: var(--accent); }
+.search-note { font-size: .85rem; color: var(--muted); margin-bottom: 1rem; }
+
+/* Table */
+.table-wrap { overflow-x: auto; }
+.vault-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: .9rem;
+}
+.vault-table th {
+  text-align: left;
+  padding: .6rem .75rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--muted);
+  font-weight: 500;
+  white-space: nowrap;
+}
+.vault-table td {
+  padding: .7rem .75rem;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+.vault-table tr:last-child td { border-bottom: none; }
+.vault-table tr:hover td { background: var(--surface2); }
+
+.td-label  { font-weight: 600; color: var(--text); }
+.td-login  { color: var(--muted); }
+.td-pass   { font-family: var(--mono); display: flex; align-items: center; gap: .4rem; }
+.td-date   { color: var(--muted); font-size: .8rem; white-space: nowrap; }
+.td-actions { display: flex; gap: .4rem; }
+.pwd-stars { letter-spacing: .1em; }
+
+/* ── Empty state ───────────────────────────────────────────────── */
+.empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--muted);
+}
+.empty-icon { font-size: 2.5rem; display: block; margin-bottom: .75rem; }
+
+/* ── Footer ────────────────────────────────────────────────────── */
+.site-footer {
+  margin-top: auto;
+  border-top: 1px solid var(--border);
+  padding: 1.25rem 0;
+  text-align: center;
+  color: var(--muted);
+  font-size: .8rem;
+}
+
+/* ── Edit form ─────────────────────────────────────────────────── */
+.edit-form { display: flex; flex-direction: column; gap: 1.1rem; }
+
+/* ── Responsive ─────────────────────────────────────────────────── */
+@media (max-width: 600px) {
+  .input-row { grid-template-columns: 1fr; }
+  .search-input { width: 160px; }
+  .vault-table { font-size: .8rem; }
+  .site-header .container { flex-direction: column; align-items: flex-start; gap: .25rem; }
+}

@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PassVault — Генератор паролей</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container">
+    <div class="logo">
+      <span class="logo-icon">🔐</span>
+      <span class="logo-text">PassVault</span>
+    </div>
+    <p class="logo-sub">Генератор и хранилище паролей</p>
+  </div>
+</header>
+
+<main class="container">
+
+  <!-- Flash сообщения -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="flashes">
+        {% for cat, msg in messages %}
+          <div class="flash flash--{{ cat }}">{{ msg }}</div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  <!-- Генератор -->
+  <section class="card generator-card">
+    <h2 class="section-title">Генератор</h2>
+
+    <div class="gen-output" id="genOutput">
+      <span class="gen-password" id="genPassword">Нажмите «Сгенерировать»</span>
+      <button class="btn-icon" id="copyBtn" title="Скопировать" onclick="copyPassword()">📋</button>
+    </div>
+
+    <form id="genForm" class="gen-controls">
+      <div class="control-row">
+        <label class="control-label">Длина: <strong id="lenDisplay">16</strong></label>
+        <input type="range" name="length" id="lenSlider" min="4" max="64" value="16"
+               oninput="document.getElementById('lenDisplay').textContent=this.value">
+      </div>
+      <div class="toggle-row">
+        <label class="toggle">
+          <input type="checkbox" name="upper" checked>
+          <span>A–Z</span>
+        </label>
+        <label class="toggle">
+          <input type="checkbox" name="digits" checked>
+          <span>0–9</span>
+        </label>
+        <label class="toggle">
+          <input type="checkbox" name="special">
+          <span>!@#…</span>
+        </label>
+      </div>
+      <button type="button" class="btn btn--primary" onclick="generate()">Сгенерировать</button>
+    </form>
+
+    <!-- Форма сохранения -->
+    <form action="/save" method="POST" class="save-form" id="saveForm">
+      <input type="hidden" name="password" id="savePassword">
+      <div class="input-row">
+        <div class="input-group">
+          <label for="label">Сайт / сервис *</label>
+          <input type="text" name="label" id="label" placeholder="GitHub" required>
+        </div>
+        <div class="input-group">
+          <label for="login">Логин / email</label>
+          <input type="text" name="login" id="loginField" placeholder="user@email.com">
+        </div>
+      </div>
+      <button type="submit" class="btn btn--save" onclick="return confirmSave()">
+        💾 Сохранить пароль
+      </button>
+    </form>
+  </section>
+
+  <!-- Хранилище -->
+  <section class="card vault-card">
+    <div class="vault-header">
+      <h2 class="section-title">Хранилище</h2>
+      <form method="GET" action="/" class="search-form">
+        <input type="text" name="q" value="{{ search }}" placeholder="Поиск по метке или логину…" class="search-input">
+        <button type="submit" class="btn btn--search">🔍</button>
+        {% if search %}
+          <a href="/" class="btn btn--ghost">✕</a>
+        {% endif %}
+      </form>
+    </div>
+
+    {% if search %}
+      <p class="search-note">Результаты для: <strong>{{ search }}</strong> — найдено {{ passwords|length }}</p>
+    {% endif %}
+
+    {% if passwords %}
+      <div class="table-wrap">
+        <table class="vault-table">
+          <thead>
+            <tr>
+              <th>Сайт / сервис</th>
+              <th>Логин</th>
+              <th>Пароль</th>
+              <th>Добавлен</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for pwd in passwords %}
+            <tr>
+              <td class="td-label">{{ pwd.label }}</td>
+              <td class="td-login">{{ pwd.login or '—' }}</td>
+              <td class="td-pass">
+                <span class="pwd-stars" id="pwd-{{ pwd.id }}">••••••••</span>
+                <button class="btn-icon" onclick="togglePwd({{ pwd.id }}, '{{ pwd.password }}')">👁</button>
+                <button class="btn-icon" onclick="navigator.clipboard.writeText('{{ pwd.password }}')">📋</button>
+              </td>
+              <td class="td-date">{{ pwd.created_at[:10] }}</td>
+              <td class="td-actions">
+                <a href="/edit/{{ pwd.id }}" class="btn btn--sm btn--edit">✏️</a>
+                <form action="/delete/{{ pwd.id }}" method="POST" style="display:inline"
+                      onsubmit="return confirm('Удалить пароль для «{{ pwd.label }}»?')">
+                  <button type="submit" class="btn btn--sm btn--del">🗑</button>
+                </form>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="empty-state">
+        <span class="empty-icon">🔑</span>
+        <p>{% if search %}Ничего не найдено{% else %}Хранилище пусто — сгенерируйте первый пароль!{% endif %}</p>
+      </div>
+    {% endif %}
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <p>PassVault · Учебный проект · ТРПО 2026</p>
+  </div>
+</footer>
+
+<script>
+  let currentPassword = '';
+
+  async function generate() {
+    const form = document.getElementById('genForm');
+    const data = new FormData(form);
+    const res = await fetch('/generate', { method: 'POST', body: data });
+    const json = await res.json();
+    currentPassword = json.password;
+    document.getElementById('genPassword').textContent = currentPassword;
+    document.getElementById('genPassword').classList.add('visible');
+  }
+
+  function copyPassword() {
+    if (!currentPassword) return;
+    navigator.clipboard.writeText(currentPassword);
+    const btn = document.getElementById('copyBtn');
+    btn.textContent = '✅';
+    setTimeout(() => btn.textContent = '📋', 1500);
+  }
+
+  function confirmSave() {
+    if (!currentPassword) {
+      alert('Сначала сгенерируйте пароль!');
+      return false;
+    }
+    document.getElementById('savePassword').value = currentPassword;
+    return true;
+  }
+
+  function togglePwd(id, pwd) {
+    const el = document.getElementById('pwd-' + id);
+    el.textContent = el.textContent === '••••••••' ? pwd : '••••••••';
+  }
+</script>
+</body>
+</html>
